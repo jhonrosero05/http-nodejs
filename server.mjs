@@ -20,7 +20,7 @@ const request = require("request"),
   app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
-app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
+//app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
 
 // Accepts POST requests at /webhook endpoint
 app.post("/webhook", (req, res) => {
@@ -41,8 +41,13 @@ app.post("/webhook", (req, res) => {
     ) {
       let phone_number_id =
         req.body.entry[0].changes[0].value.metadata.phone_number_id;
+      let to = req.body.entry[0].changes[0].value.metadata.display_phone_number;
       let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
       let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
+      let id = req.body.entry[0].changes[0].value.messages[0].id; // extract the message text from the webhook payload
+      let tipo = req.body.entry[0].changes[0].value.messages[0].type; // extract the message text from the webhook payload
+      
+      
       axios({
         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
         url:
@@ -57,15 +62,20 @@ app.post("/webhook", (req, res) => {
         },
         headers: { "Content-Type": "application/json" },
       });
-      // axios.post('http://arroyave.digital:88/app/public/webhook', {
-      //     firstName: 'Finn',
-      //     lastName: 'Williams'
-      //   })
-      //   .then((response) => {
-      //     console.log(response);
-      //   }, (error) => {
-      //     console.log(error);
-      //   });
+      
+      
+      axios.post('http://arroyave.digital:88/app/public/whatsa', {
+          from: from,
+          to: to,
+          idMsg: id,
+          text: msg_body,
+          tipo: tipo
+        })
+        .then((response) => {
+          //console.log(response);
+        }, (error) => {
+          //console.log(error);
+        });
     }
     res.sendStatus(200);
   } else {
